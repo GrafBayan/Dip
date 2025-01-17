@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Создать чат</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'MySite/style.css' %}">
+    <link rel="stylesheet" href="{% static 'MyChat/style.css' %}">
+</head>
+<body>
+    {% include 'MySite/cap.html' %}
+    {% include 'MyChat/sidebar.html' %}
+
+    <main>
+        <h1>Создать новый чат</h1>
+        <form method="POST" id="create_chat_form">
+            {% csrf_token %}
+            <input type="text" id="chat_name" name="chat_name" placeholder="Название чата" class="search-input" required>
+
+            <h2>Пригласить пользователей</h2>
+            <div class="user-invite-container">
+                {% for user in users %}
+                    {% if user.id != request.user.id %} <!-- Убираем текущего пользователя из списка -->
+                        <div>
+                            <input type="checkbox" name="invited_users" value="{{ user.id }}" id="user_{{ user.id }}">
+                            <label for="user_{{ user.id }}">{{ user.username }}</label>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="search-button">Создать чат</button>
+        </form>
+    </main>
+</body>
+</html>

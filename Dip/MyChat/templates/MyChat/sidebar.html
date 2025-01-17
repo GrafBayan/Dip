@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .sidebar {
+            position: fixed;
+            left: -300px; /* Скрыто по умолчанию */
+            width: 303px;
+            height: 100%;
+            background-color: #7D7D7D;
+            transition: left 0.3s;
+            z-index: 1000;
+
+        }
+        .sidebar-content {
+            padding: 20px;
+        }
+        .menu-toggle {
+            position: fixed;
+            left: 0;
+            top: 80px;
+            width: 25px;
+            height: calc(100% - 50px);
+            background-color: #5A6E3A; /* Тёмно-оливковый цвет для кнопки */
+            cursor: pointer;
+            transition: left 0.3s;
+            display: flex;
+            align-items: center; /* Центрируем стрелочку по вертикали */
+            justify-content: center; /* Центрируем стрелочку по горизонтали */
+            font-size: 20px; /* Увеличиваем размер стрелочки */
+            color: white; /* Цвет стрелочки */
+        }
+        /* Стили для ссылок в боковом меню */
+        .sidebar-content ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar-content a {
+            text-decoration: none;
+            color: #333; /* Цвет текста */
+            display: block;
+            padding: 10px;
+            border: 1px solid #5A6E3A; /* Рамка вокруг ссылки */
+            border-radius: 5px; /* Скругление углов */
+            margin-bottom: 10px; /* Отступ между ссылками */
+            transition: background-color 0.3s, color 0.3s; /* Плавный переход цвета */
+        }
+
+        .sidebar-content a:hover {
+            color: #FFFFFF;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+<div id="sidebar" class="sidebar">
+    <div class="sidebar-content">
+        <h2>Ваши чаты</h2>
+        {% if user_chats %}
+            <ul>
+                {% for chat in user_chats %}
+                    <li>
+                        <a href="{% url 'chat_page' chat.id %}">{{ chat.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>У вас пока нет чатов.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Кнопка-край меню -->
+<div id="menu-toggle" class="menu-toggle">➔</div>
+
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const menuToggle = document.getElementById('menu-toggle');
+
+    menuToggle.onclick = function() {
+        if (sidebar.style.left === '0px') {
+            sidebar.style.left = '-300px';
+            menuToggle.style.left = '0';
+        } else {
+            sidebar.style.left = '0px';
+            menuToggle.style.left = '300px';
+        }
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Шапка сайта</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Основные стили для html и body */
+        html, body {
+            margin: 0; /* Убираем отступы */
+            padding: 0; /* Убираем внутренние отступы */
+            height: 100%; /* Задаем высоту в 100% */
+            font-family: Arial, sans-serif; /* Устанавливаем шрифт по умолчанию */
+        }
+
+        /* Основные стили для шапки */
+        header {
+            background-color: #444444; /* Темно-серый фон */
+            padding: 15px 20px; /* Отступы */
+            color: white;
+            display: flex; /* Flexbox для выравнивания */
+            align-items: center; /* Центрируем элементы по вертикали */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Тень для шапки */
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            width: 100%; /* Задаем ширину 100% */
+            justify-content: space-between; /* Равномерное распределение элементов */
+        }
+
+        .logo {
+            width: 50px; /* Ширина логотипа */
+            height: 50px; /* Высота логотипа */
+            border-radius: 50%; /* Округление для создания круга */
+            object-fit: cover; /* Обрезка изображения по краям */
+        }
+
+        .site-title {
+            font-size: 28px; /* Размер шрифта для названия сайта */
+            margin-left: -1000px; /* Отступ между логотипом и текстом */
+            white-space: nowrap; /* Не переносим текст на новую строку */
+            color: #7D7D7D; /* Светлый цвет текста для контраста */
+        }
+
+        .user-menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #fff;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 5px;
+        }
+
+        .user-menu:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .header-button {
+            background-color: #007bff; /* Цвет кнопки */
+            color: white; /* Цвет текста */
+            border: none; /* Убираем рамку */
+            padding: 10px 15px; /* Отступы внутри кнопки */
+            border-radius: 5px; /* Скругление углов */
+            cursor: pointer; /* Курсор при наведении */
+            transition: background-color 0.3s, transform 0.2s; /* Плавный переход цвета и увеличение */
+            font-size: 16px; /* Размер шрифта кнопки */
+            margin-left: 10px; /* Отступ между кнопками */
+        }
+
+        .header-button:hover {
+            background-color: #0056b3; /* Цвет кнопки при наведении */
+            transform: scale(1.05); /* Увеличение кнопки при наведении */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <img src="{% static 'MySite/dice_mark.png' %}" alt="Логотип" class="logo">
+            <div class="site-title">Ваш столик</div>
+            <div class="header-buttons">
+                {% if user.is_authenticated %}
+                    <div class="user-menu">
+                        <button class="header-button">
+                            <i class="fas fa-user"></i> {{ user.username }}
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="{% url 'profile' %}">
+                                <i class="fas fa-user-circle"></i> Профиль
+                            </a>
+                            <a href="{% url 'home' %}">
+                                <i class="fas fa-home"></i> Главная
+                            </a>
+                            <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="header-button">
+                                    <i class="fas fa-door-open"></i> Выход
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="user-menu">
+                        <button class="header-button">
+                            <i class="fas fa-user"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="{% url 'register' %}">Зарегистрируйтесь</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+</body>

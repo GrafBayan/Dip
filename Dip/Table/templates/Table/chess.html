@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игровая сессия - Шашки</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'MySite/style.css' %}">
+</head>
+<body>
+    {% include 'MySite/cap.html' %}
+    <style>
+        /* Стили для основного контейнера */
+        main {
+            margin: 0 auto;
+            padding: 20px;
+            max-width: 800px; /* Максимальная ширина для центрирования */
+            text-align: center; /* Центрируем текст */
+        }
+
+        /* Стили для заголовков */
+        h1, h2 {
+            color: #333; /* Цвет заголовков */
+            margin-bottom: 20px; /* Отступ снизу */
+        }
+
+        /* Стили для формы */
+        .form-container {
+            margin-bottom: 20px; /* Отступ снизу */
+            display: flex;
+            flex-direction: column; /* Выравнивание по вертикали */
+            align-items: center; /* Центрируем элементы по горизонтали */
+        }
+
+        /* Стили для полей ввода */
+        #room-name {
+            width: 100%; /* Занимает всю ширину */
+            max-width: 350px; /* Максимальная ширина для поля ввода */
+            height: 35px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px; /* Отступ снизу */
+        }
+
+        /* Стили для кнопки создания комнаты */
+        .header-button {
+            padding: 10px 20px; /* Увеличиваем размер кнопки */
+            background-color: #4b5b2c; /* Темно-оливковый цвет кнопки */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px; /* Отступ сверху */
+        }
+
+        .header-button:hover {
+            background-color: #3a4a2c; /* Темнее на ховер */
+        }
+
+        /* Стили для списка игровых сессий */
+        .room-list {
+            margin-top: 20px; /* Отступ сверху */
+        }
+
+        .room-list ul {
+            list-style-type: none; /* Убираем маркеры списка */
+            padding: 0; /* Убираем отступы */
+            margin: 0; /* Убираем отступы */
+        }
+
+        .room-item {
+            padding: 10px;
+            border: 1px solid #ccc; /* Обводка вокруг элемента */
+            border-radius: 15px; /* Округленные углы */
+            margin-bottom: 10px;
+            background-color: #f9f9f9; /* Цвет фона */
+            transition: background-color 0.2s; /* Плавный переход цвета фона */
+            text-align: center; /* Центрируем текст в списке */
+        }
+
+        .room-item:hover {
+            background-color: #f0f0f0; /* Цвет фона при наведении */
+        }
+    </style>
+    <main>
+        <h1>Игровая сессия: {{ room.name }}</h1>
+        <p>Добро пожаловать к столу! Нажмите кнопку ниже, чтобы начать игру.</p>
+        <button onclick="startGame()" class="header-button">Играть</button>
+        <button onclick="endGame()" class="header-button">Закончить игру</button>  <!-- Кнопка для завершения игры -->
+    </main>
+
+    <script>
+        function startGame() {
+            fetch('/start_game/', {  // URL для вашего представления
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.status);  // Отображение статуса
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function endGame() {
+            fetch(`/close_room/{{ room.id }}/`, {  // URL для завершения игры
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/ches/';  // Перенаправление на страницу с комнатами
+                } else {
+                    alert('Ошибка при закрытии комнаты');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>

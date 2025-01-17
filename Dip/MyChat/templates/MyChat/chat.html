@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ chat.name }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'MySite/style.css' %}">
+    <link rel="stylesheet" href="{% static 'MyChat/style.css' %}">
+    <style>
+        main {
+            margin: 0 auto;
+            padding: 20px;
+            max-width: 800px;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+/
+        .chat-window {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .chat-window ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .input-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        #message-input {
+            flex-grow: 1;
+            height: 35px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        #send-button, #roll-button, #add-user-button {
+            padding: 5px 10px;
+            background-color: #5A6E3A;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-left: 10px;
+        }
+
+        #send-button:hover, #roll-button:hover, #add-user-button:hover {
+            background-color: #4B5B2C;
+        }
+
+        .roll-popup {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            z-index: 1000;
+        }
+
+        .roll-popup .button {
+            padding: 5px 10px;
+            background-color: #5A6E3A;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 5px;
+        }
+
+        .roll-popup .button:hover {
+            background-color: #4B5B2C;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        #close-modal {
+            cursor: pointer;
+            color: #5A6E3A;
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    {% include 'MySite/cap.html' %}
+    {% include 'MyChat/sidebar.html' %}
+
+    <main>
+        <h1>{{ chat.name }}</h1>
+        <div class="chat-window" id="chat-window">
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li><strong>{{ message.user.username }}:</strong> {{ message.text }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Нет сообщений в этом чате.</p>
+            {% endif %}
+        </div>
+
+        <div class="input-container">
+            <input type="text" id="message-input" placeholder="Введите сообщение">
+            <button id="send-button">Отправить</button>
+            <button class="roll-button" id="roll-button">Roll</button>
+        </div>
+        <button id="add-user-button">Добавить в чат</button>
+
+        <div class="roll-popup" id="roll-popup">
+            <div>
+                <button class="button" data-die="20">D20</button>
+                <button class="button" data-die="12">D12</button>
+                <button class="button" data-die="10">D10</button>
+                <button class="button" data-die="8">D8</button>
+            </div>
+            <div>
+                <button class="button" data-die="6">D6</button>
+                <button class="button" data-die="4">D4</button>
+                <button class="button" data-die="100">D100</button>
+                <button class="button" data-die="CRIT">CRIT</button>
+            </div>
+        </div>
+
+        <!-- Модальное окно для выбора пользователей -->
+        <div class="modal" id="user-modal">
+            <div class="modal-content">
+                <span id="close-modal">&times; Закрыть</span>
+                <h2>Выберите пользователя для приглашения</h2>
+                <form id="invite-form">
+                    <select id="user-select" required>
+                        <option value="">Выберите пользователя</option>
+                        {% for user in available_users %}
+                            <option value="{{ user.id }}">{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit">Отправить приглашение</button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            document.getElementById('send-button').onclick = function() {
+                const messageInput = document.getElementById('message-input');
+                const messageText = messageInput.value;
+
+                if (messageText) {
+                    // Отправка сообщения на сервер
+                    fetch('{% url "send_message" chat.id %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({
+                            text: messageText
+                        })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        throw new Error('Ошибка отправки сообщения');
+                    })
+                    .then(data => {
+                        // Обновление окна чата с новым сообщением
+                        const chatWindow = document.getElementById('chat-window');
+                        const messageList = chatWindow.querySelector('ul');
+                        const newMessage = document.createElement('li');
+                        newMessage.innerHTML = `<strong>${data.username}:</strong> ${data.text}`;
+                        messageList.appendChild(newMessage);
+                        messageInput.value = '';
+                    })
+                    .catch(error => {
+                        console.error('Ошибка:', error);
+                    });
+                }
+            };
+
+            // Обработчик для кнопки Roll
+            document.getElementById('roll-button').onclick = function(event) {
+                const rollPopup = document.getElementById('roll-popup');
+                rollPopup.style.display = rollPopup.style.display === 'block' ? 'none' : 'block';
+
+                // Установка позиции всплывающего меню
+                const buttonRect = event.target.getBoundingClientRect();
+                rollPopup.style.top = `${buttonRect.bottom + window.scrollY}px`;
+                rollPopup.style.left = `${buttonRect.left}px`;
+            };
+
+            // Обработчик для кнопок кубиков
+            const rollButtons = document.querySelectorAll('.roll-popup .button');
+            rollButtons.forEach(button => {
+                button.onclick = function() {
+                    const dieValue = this.getAttribute('data-die');
+                    let rollResult;
+
+                    if (dieValue === 'CRIT') {
+                        rollResult = 'Критический успех!';
+                    } else {
+                        const sides = parseInt(dieValue);
+                        rollResult = Math.floor(Math.random() * sides) + 1;
+                    }
+
+                    fetch('{% url "send_message" chat.id %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({
+                            text: `Результат броска ${dieValue}: ${rollResult}`
+                        })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        throw new Error('Ошибка отправки сообщения');
+                    })
+                    .then(data => {
+                        const chatWindow = document.getElementById('chat-window');
+                        const messageList = chatWindow.querySelector('ul');
+                        const newMessage = document.createElement('li');
+                        newMessage.innerHTML = `<strong>${data.username}:</strong> ${data.text}`;
+                        messageList.appendChild(newMessage);
+                    })
+                    .catch(error => {
+                        console.error('Ошибка:', error);
+                    });
+
+                    document.getElementById('roll-popup').style.display = 'none';
+                };
+            });
+
+            // Обработчик для кнопки "Добавить в чат"
+            document.getElementById('add-user-button').onclick = function() {
+                const userModal = document.getElementById('user-modal');
+                userModal.style.display = 'block';
+            };
+
+            // Обработчик для закрытия окна
+            document.getElementById('close-modal').onclick = function() {
+                document.getElementById('user-modal').style.display = 'none';
+            };
+
+            // Обработчик для формы приглашения
+            document.getElementById('invite-form').onsubmit = function(event) {
+                event.preventDefault(); // Предотвращаем стандартное поведение формы
+                const userId = document.getElementById('user-select').value;
+
+                // Отправка приглашения на сервер
+                fetch('{% url "send_invite" chat.id %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'  // Добавляем CSRF-токен
+                    },
+                    body: JSON.stringify({
+                        user_id: userId
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Ошибка отправки приглашения');
+                })
+                .then(data => {
+                    alert(data.message); // Уведомляем пользователя о результате
+                    document.getElementById('user-modal').style.display = 'none'; // Закрываем модальное окно
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при отправке приглашения.'); // Уведомляем об ошибке
+                });
+            };
+        </script>
+    </main>
+</body>
+</html>

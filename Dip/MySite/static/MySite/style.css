@@ -1,0 +1,56 @@
+body {
+    background-image: url('/static/MySite/table2.png'); /* Используйте абсолютный путь к статическому файлу */
+    background-size: cover; /* Это заставит изображение покрывать всю область */
+    background-repeat: no-repeat; /* Это предотвратит повторение изображения */
+    background-position: center;
+    margin: 0; /* Убедитесь, что нет отступов */
+    padding: 0; /* Убедитесь, что нет внутренних отступов */
+    height: 100vh; /* Задайте высоту вьюпорта */
+    overflow: hidden; /* Скрывает лишнее */
+    font-family: Arial, sans-serif;
+}
+
+
+.logo {
+    height: 50px;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.header-button {
+    text-decoration: none;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 20px;
+}
+
+.image-button {
+    text-align: center;
+    text-decoration: none;
+}
+
+.image-button img {
+    width: 200px;
+    height: 150px;
+    border-radius: 10px;
+}
+
+.form-container {
+    padding: 0 40px;
+}
+
+.custom-container {
+    padding-left: 38%;
+    padding-right: 38%;
+}

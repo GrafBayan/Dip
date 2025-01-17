@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль пользователя</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'MySite/style.css' %}">
+    <style>
+        .profile-container {
+            display: flex;
+            justify-content: space-between; /* Разделить контейнеры по краям */
+            padding: 20px;
+        }
+        .chat-list, .invitation-list {
+            border: 1px solid #ccc;
+            border-radius: 5px; /* Скругление углов */
+            padding: 10px;
+            width: 45%;
+            min-height: 200px;
+            background-color: #f9f9f9; /* Цвет фона для улучшения читабельности */
+        }
+        .empty-message {
+            color: #888;
+            text-align: center;
+        }
+        .chat-item, .invitation-item {
+            margin: 10px 0; /* Увеличиваем отступы для лучшей читаемости */
+            padding: 10px; /* Добавляем внутренние отступы */
+            border: 1px solid #ddd; /* Добавляем рамку для каждого элемента */
+            border-radius: 4px; /* Скругление углов */
+            background-color: #fff; /* Цвет фона для элементов */
+            transition: background-color 0.3s; /* Плавный переход при наведении */
+        }
+        .chat-item:hover, .invitation-item:hover {
+            background-color: #f1f1f1; /* Цвет фона при наведении */
+        }
+        .button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            margin-left: 10px; /* Отступ между кнопками */
+            transition: background-color 0.3s; /* Плавный переход при наведении */
+        }
+        .accept-button {
+            background-color: blue;
+        }
+        .accept-button:hover {
+            background-color: darkblue; /* Углубленный цвет при наведении */
+        }
+        .decline-button {
+            background-color: red;
+        }
+        .decline-button:hover {
+            background-color: darkred; /* Углубленный цвет при наведении */
+        }
+        /* Стили для ссылок в списке чатов */
+        .chat-item a {
+            color: #007BFF; /* Цвет ссылки */
+            text-decoration: none; /* Убираем подчеркивание */
+            font-weight: bold; /* Делаем текст жирным */
+        }
+        .chat-item a:hover {
+            text-decoration: underline; /* Подчеркивание при наведении */
+        }
+        .invitation-item {
+            display: flex; /* Выравнивание элементов в строку */
+            justify-content: space-between; /* Разделение текста и кнопок */
+            align-items: center; /* Центрирование по вертикали */
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.accept-button, .decline-button').click(function(event) {
+                event.preventDefault(); // Отменяем стандартное поведение ссылки
+                const button = $(this);
+                const url = button.attr('href');
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}' // Добавляем CSRF токен для защиты
+                    },
+                    success: function(data) {
+                        // Показываем сообщение пользователю
+                        alert(data.message);
+                        // Удаляем элемент из списка
+                        button.closest('.invitation-item').remove();
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Произошла ошибка: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    {% include 'MySite/cap.html' %}
+
+    <main>
+        <h1>Профиль пользователя</h1>
+        <div class="profile-container">
+            <div class="chat-list">
+                <h2>Ваши чаты</h2>
+                {% if chats %}
+                    {% for chat in chats %}
+                        <div class="chat-item">
+                            <a href="{% url 'chat_page' chat.id %}">{{ chat.name }}</a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="empty-message">У вас нет чатов.</p>
+                {% endif %}
+            </div>
+            <div class="invitation-list">
+                <h2>Приглашения в чаты</h2>
+                {% if invitations %}
+                    {% for invitation in invitations %}
+                        <div class="invitation-item">
+                            <p>Приглашение от {{ invitation.sender.username }} в чат <strong>{{ invitation.chat.name }}</strong></p>
+                            <div>
+                                <a href="{% url 'accept_invite' invitation.id %}" class="button accept-button">Принять</a>
+                                <a href="{% url 'decline_invite' invitation.id %}" class="button decline-button">Отклонить</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="empty-message">У вас нет приглашений в чаты.</p>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</body>
+</html>
