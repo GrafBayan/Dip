@@ -8,31 +8,31 @@
     <style>
         .profile-container {
             display: flex;
-            justify-content: space-between; /* Разделить контейнеры по краям */
+            justify-content: space-between;
             padding: 20px;
         }
         .chat-list, .invitation-list {
             border: 1px solid #ccc;
-            border-radius: 5px; /* Скругление углов */
+            border-radius: 5px;
             padding: 10px;
             width: 45%;
             min-height: 200px;
-            background-color: #f9f9f9; /* Цвет фона для улучшения читабельности */
+            background-color: #f9f9f9;
         }
         .empty-message {
             color: #888;
             text-align: center;
         }
         .chat-item, .invitation-item {
-            margin: 10px 0; /* Увеличиваем отступы для лучшей читаемости */
-            padding: 10px; /* Добавляем внутренние отступы */
-            border: 1px solid #ddd; /* Добавляем рамку для каждого элемента */
-            border-radius: 4px; /* Скругление углов */
-            background-color: #fff; /* Цвет фона для элементов */
-            transition: background-color 0.3s; /* Плавный переход при наведении */
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+            transition: background-color 0.3s;
         }
         .chat-item:hover, .invitation-item:hover {
-            background-color: #f1f1f1; /* Цвет фона при наведении */
+            background-color: #f1f1f1;
         }
         .button {
             padding: 10px 15px;
@@ -41,34 +41,34 @@
             cursor: pointer;
             text-decoration: none;
             color: white;
-            margin-left: 10px; /* Отступ между кнопками */
-            transition: background-color 0.3s; /* Плавный переход при наведении */
+            margin-left: 10px;
+            transition: background-color 0.3s;
         }
         .accept-button {
             background-color: blue;
         }
         .accept-button:hover {
-            background-color: darkblue; /* Углубленный цвет при наведении */
+            background-color: darkblue;
         }
         .decline-button {
             background-color: red;
         }
         .decline-button:hover {
-            background-color: darkred; /* Углубленный цвет при наведении */
+            background-color: darkred;
         }
         /* Стили для ссылок в списке чатов */
         .chat-item a {
-            color: #007BFF; /* Цвет ссылки */
-            text-decoration: none; /* Убираем подчеркивание */
-            font-weight: bold; /* Делаем текст жирным */
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
         }
         .chat-item a:hover {
-            text-decoration: underline; /* Подчеркивание при наведении */
+            text-decoration: underline;
         }
         .invitation-item {
-            display: flex; /* Выравнивание элементов в строку */
-            justify-content: space-between; /* Разделение текста и кнопок */
-            align-items: center; /* Центрирование по вертикали */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -83,12 +83,10 @@
                     url: url,
                     type: 'POST',
                     headers: {
-                        'X-CSRFToken': '{{ csrf_token }}' // Добавляем CSRF токен для защиты
+                        'X-CSRFToken': '{{ csrf_token }}' // CSRF токен
                     },
                     success: function(data) {
-                        // Показываем сообщение пользователю
                         alert(data.message);
-                        // Удаляем элемент из списка
                         button.closest('.invitation-item').remove();
                     },
                     error: function(xhr, status, error) {

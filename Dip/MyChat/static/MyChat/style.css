@@ -12,28 +12,28 @@ h1, h2 {
 
 /* Стили для полей ввода */
 .search-input, #room-name {
-    width: 100%; /* Занимает всю ширину */
+    width: 100%;
     height: 35px;
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    margin-bottom: 20px; /* Отступ снизу */
+    margin-bottom: 20px;
 }
 
 /* Стили для контейнера пользователей */
 .user-invite-container {
-    margin-bottom: 20px; /* Отступ снизу */
+    margin-bottom: 20px;
 }
 
 /* Стили для чекбоксов */
 .user-invite-container div {
-    margin-bottom: 10px; /* Отступ между пользователями */
+    margin-bottom: 10px;
 }
 
 /* Стили для кнопок */
 .search-button, .header-button {
-    padding: 8px 15px; /* Увеличиваем размер кнопки */
-    background-color: #5A6E3A; /* Цвет кнопки */
+    padding: 8px 15px;
+    background-color: #5A6E3A;
     color: white;
     border: none;
     border-radius: 5px;
@@ -42,7 +42,7 @@ h1, h2 {
 }
 
 .search-button:hover, .header-button:hover {
-    background-color: #4B5B2C; /* Темнее на ховер */
+    background-color: #4B5B2C;
 }
 
 /* Стили для окна чата */
@@ -50,41 +50,41 @@ h1, h2 {
     border: 1px solid #ccc; /* Обводка вокруг окна чата */
     border-radius: 5px;
     padding: 10px;
-    height: 400px; /* Высота окна чата */
+    height: 400px;
     overflow-y: auto; /* Прокрутка по вертикали */
-    margin-bottom: 20px; /* Отступ снизу */
+    margin-bottom: 20px;
 }
 
 /* Стили для списка сообщений */
 .chat-window ul {
-    list-style-type: none; /* Убираем маркеры списка */
-    padding: 0; /* Убираем отступы */
+    list-style-type: none;
+    padding: 0;
 }
 
 /* Стили для полей ввода сообщений */
 #message-input {
-    width: calc(100% - 120px); /* Занимает всю ширину за вычетом ширины кнопок */
+    width: calc(100% - 120px);
     height: 35px;
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    margin-right: 10px; /* Отступ справа */
+    margin-right: 10px;
 }
 
 /* Стили для кнопок сообщений */
 #send-button, #roll-button, #add-user-button {
-    padding: 5px 10px; /* Уменьшение размера кнопок */
-    background-color: #5A6E3A; /* Цвет кнопок */
+    padding: 5px 10px;
+    background-color: #5A6E3A;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
-    margin-left: 10px; /* Отступ слева между кнопками */
+    margin-left: 10px;
 }
 
 #send-button:hover, #roll-button:hover, #add-user-button:hover {
-    background-color: #4B5B2C; /* Темнее на ховер */
+    background-color: #4B5B2C;
 }
 
 /* Стили для всплывающего меню */

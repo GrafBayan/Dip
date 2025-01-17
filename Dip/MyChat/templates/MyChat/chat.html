@@ -283,7 +283,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'  // Добавляем CSRF-токен
+                        'X-CSRFToken': '{{ csrf_token }}'  // Ндо будет добавить CSRF-токен
                     },
                     body: JSON.stringify({
                         user_id: userId
@@ -296,12 +296,12 @@
                     throw new Error('Ошибка отправки приглашения');
                 })
                 .then(data => {
-                    alert(data.message); // Уведомляем пользователя о результате
-                    document.getElementById('user-modal').style.display = 'none'; // Закрываем модальное окно
+                    alert(data.message);
+                    document.getElementById('user-modal').style.display = 'none';
                 })
                 .catch(error => {
                     console.error('Ошибка:', error);
-                    alert('Произошла ошибка при отправке приглашения.'); // Уведомляем об ошибке
+                    alert('Произошла ошибка при отправке приглашения.');
                 });
             };
         </script>

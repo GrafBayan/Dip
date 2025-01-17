@@ -11,15 +11,45 @@
 
     <main>
         <h1>Добро пожаловать!</h1>
+
+        <!-- Блок для отображения уведомлений -->
+        {% if messages %}
+            <div class="notifications">
+                {% for message in messages %}
+                    <div class="notification">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const notifications = document.querySelectorAll('.notification');
+                notifications.forEach(notification => {
+                    setTimeout(() => {
+                        notification.style.transition = "opacity 0.6s ease";
+                        notification.style.opacity = 0;
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 600);
+                    }, 3000);
+                });
+            });
+        </script>
+
         <div class="button-container">
-            <a href="{% url 'chat_list' %}" class="image-button">
-                <img src="{% static 'MySite/chat.png' %}" alt="Чат">
-                <p>Чат</p>
-            </a>
-            <a href="{% url 'game_page' %}" class="image-button">
-                <img src="{% static 'MySite/game_field.png' %}" alt="Игровое поле">
-                <p>Игровое поле</p>
-            </a>
+            <form method="POST" action="{% url 'home' %}">
+                {% csrf_token %}
+                <button type="submit" name="chat" class="image-button">
+                    <img src="{% static 'MySite/chat.png' %}" alt="Чат">
+                    <p>Чат</p>
+                </button>
+            </form>
+            <form method="POST" action="{% url 'home' %}">
+                {% csrf_token %}
+                <button type="submit" name="game" class="image-button">
+                    <img src="{% static 'MySite/game_field.png' %}" alt="Игровое поле">
+                    <p>Игровое поле</p>
+                </button>
+            </form>
         </div>
     </main>
 </body>
