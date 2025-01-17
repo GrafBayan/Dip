@@ -1,12 +1,12 @@
 body {
-    background-image: url('/static/MySite/table2.png'); /* Используйте абсолютный путь к статическому файлу */
-    background-size: cover; /* Это заставит изображение покрывать всю область */
-    background-repeat: no-repeat; /* Это предотвратит повторение изображения */
+    background-image: url('/static/MySite/table2.png');
+    background-size: cover;
+    background-repeat: no-repeat;
     background-position: center;
-    margin: 0; /* Убедитесь, что нет отступов */
-    padding: 0; /* Убедитесь, что нет внутренних отступов */
-    height: 100vh; /* Задайте высоту вьюпорта */
-    overflow: hidden; /* Скрывает лишнее */
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
     font-family: Arial, sans-serif;
 }
 
