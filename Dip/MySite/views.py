@@ -4,7 +4,7 @@ from .forms import UserRegisterForm
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from MyChat.models import Chat, ChatInvite, ChatJoinRequest
+from MyChat.models import Chat, ChatInvite, ChatJoinRequest, Message
 from django.contrib import messages as django_messages
 from django.db.models import Q
 from itertools import chain
@@ -76,6 +76,10 @@ def accept_invite(request, invite_id):
     invite.chat.users.add(invite.user)
     invite.status = 'accepted'
     invite.save()
+
+    # Отправляем сообщение о присоединении
+    Message.objects.create(chat=invite.chat, user=invite.user, text=f'{invite.user.username} присоединился к чату "{invite.chat.name}".')
+
     return JsonResponse({'message': f'Приглашение принято! Вы добавлены в чат "{invite.chat.name}".'})
 
 @login_required
@@ -105,16 +109,20 @@ def accept_join_request(request, request_id):
     join_request.status = 'accepted'
     join_request.save()
 
-    return JsonResponse({'message': f'Запрос на вступление принят! {join_request.user.username} добавлен в чат "{join_request.chat.name}".'})
+    # Отправляем сообщение о присоединении
+    Message.objects.create(chat=join_request.chat, user=join_request.user, text=f'{join_request.user.username} добавлен в чат "{join_request.chat.name}".')
 
+    return JsonResponse({'message': f'Запрос на вступление принят! {join_request.user.username} добавлен в чат "{join_request.chat.name}".'})
 
 
 @login_required
 def decline_join_request(request, request_id):
     join_request = get_object_or_404(ChatJoinRequest, id=request_id)
+
+    # Проверяем, что текущий пользователь является создателем чата
     if join_request.chat.creator != request.user:
         return JsonResponse({'message': 'Вы не имеете прав на отклонение этого запроса.'}, status=403)
+
     join_request.status = 'declined'
     join_request.save()
-
     return JsonResponse({'message': 'Запрос на вступление отклонён.'})

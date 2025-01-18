@@ -10,6 +10,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='home'), name='logout'),
     path('invite/accept/<int:invite_id>/', accept_invite, name='accept_invite'),
     path('invite/decline/<int:invite_id>/', decline_invite, name='decline_invite'),
-    path('accept-join-request/<int:request_id>/', accept_join_request, name='accept_join_request'),
-    path('decline-join-request/<int:request_id>/', decline_join_request, name='decline_join_request'),
+    path('accept_join_request/<int:request_id>/', accept_join_request, name='accept_join_request'),
+    path('decline_join_request/<int:request_id>/', decline_join_request, name='decline_join_request'),
+
 ]

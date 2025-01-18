@@ -14,7 +14,8 @@ class Chat(models.Model):
 
 class ChatInvite(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='invites')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='invites')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='invites')  # Пользователь, который получает приглашение
+    inviter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_invites')  # Пользователь, который отправил приглашение
     status = models.CharField(max_length=10, choices=[('pending', 'Pending'), ('accepted', 'Accepted'), ('declined', 'Declined')], default='pending')
 
     class Meta:

@@ -18,17 +18,43 @@
         }
 
         .chat-window {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
+            background-color: #faebd7;
+            display: flex;
+            flex-direction: column;
             height: 400px;
             overflow-y: auto;
-            margin-bottom: 20px;
+            padding: 10px;
         }
 
-        .chat-window ul {
+        #message-list {
             list-style-type: none;
             padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .my-message {
+            align-self: flex-end;
+            background-color: #6b8e23;
+            color: white;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px 0;
+            max-width: 70%;
+            word-wrap: break-word;
+            margin-left: auto;
+        }
+
+        .other-message {
+            align-self: flex-start;
+            background-color: #444444;
+            color: white;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px 0;
+            max-width: 70%;
+            word-wrap: break-word;
         }
 
         .input-container {
@@ -155,6 +181,34 @@
         #invite-form button[type="submit"]:hover {
             background-color: #4B5B2C;
         }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .button-container button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #add-user-button {
+            background-color: #5A6E3A;
+            color: white;
+        }
+
+        #leave-chat-button {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        #add-user-button:hover, #leave-chat-button:hover {
+            background-color: #4B5B2C;
+        }
     </style>
 </head>
 <body>
@@ -165,9 +219,11 @@
         <h1>{{ chat.name }}</h1>
         <div class="chat-window" id="chat-window">
             {% if messages %}
-                <ul>
+                <ul id="message-list">
                     {% for message in messages %}
-                        <li><strong>{{ message.user.username }}:</strong> {{ message.text }}</li>
+                        <li class="{% if message.user == request.user %}my-message{% else %}other-message{% endif %}">
+                            <strong>{{ message.user.username }}:</strong> {{ message.text }}
+                        </li>
                     {% endfor %}
                 </ul>
             {% else %}
@@ -180,7 +236,15 @@
             <button id="send-button">Отправить</button>
             <button class="roll-button" id="roll-button">Roll</button>
         </div>
-        <button id="add-user-button">Добавить в чат</button>
+
+        <div class="button-container" style="display: flex; margin-top: 20px; justify-content: flex-start;">
+            <button id="add-user-button">Добавить в чат</button>
+
+            <form action="{% url 'leave_chat' chat.id %}" method="post" id="leave-chat-form" style="margin-top: 20px;">
+                {% csrf_token %}
+                <button type="button" id="leave-chat-button" class="btn btn-danger">Выйти из чата</button>
+            </form>
+        </div>
 
         <div class="roll-popup" id="roll-popup">
             <div>
@@ -217,6 +281,19 @@
         </div>
 
         <script>
+            const messageList = document.getElementById('message-list');
+            const chatWindow = document.getElementById('chat-window');
+
+            // Функция для прокрутки вниз
+            function scrollToBottom() {
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+
+            // Прокрутка вниз при загрузке страницы
+            window.onload = function() {
+                scrollToBottom();
+            };
+
             document.getElementById('send-button').onclick = function() {
                 const messageInput = document.getElementById('message-input');
                 const messageText = messageInput.value;
@@ -241,12 +318,13 @@
                     })
                     .then(data => {
                         // Обновление окна чата с новым сообщением
-                        const chatWindow = document.getElementById('chat-window');
-                        const messageList = chatWindow.querySelector('ul');
                         const newMessage = document.createElement('li');
                         newMessage.innerHTML = `<strong>${data.username}:</strong> ${data.text}`;
                         messageList.appendChild(newMessage);
                         messageInput.value = '';
+
+                        // Прокрутка вниз после добавления нового сообщения
+                        scrollToBottom();
                     })
                     .catch(error => {
                         console.error('Ошибка:', error);
@@ -351,6 +429,13 @@
                     console.error('Ошибка:', error);
                     alert('Произошла ошибка при отправке приглашения.');
                 });
+            };
+
+            document.getElementById('leave-chat-button').onclick = function() {
+                const confirmation = confirm('Вы действительно хотите покинуть этот чат?');
+                if (confirmation) {
+                    document.getElementById('leave-chat-form').submit();
+                }
             };
         </script>
     </main>

@@ -156,52 +156,56 @@
                         });
                     },
                     error: function(xhr, status, error) {
-                        alert('Произошла ошибка: ' + error);
+                        alert('Произошла ошибка: ' + xhr.responseText); // Изменили на xhr.responseText для более информативного сообщения
                     }
                 });
             });
         });
     </script>
-</head>
-<body>
-    {% include 'MySite/cap.html' %}
+    </head>
+    <body>
+        {% include 'MySite/cap.html' %}
 
-    <main>
-        <h1>Профиль пользователя</h1>
-        <div class="profile-container">
-            <div class="chat-list">
-                <h2>Ваши чаты</h2>
-                {% if chats %}
-                    {% for chat in chats %}
-                        <div class="chat-item">
-                            <a href="{% url 'chat_page' chat.id %}">{{ chat.name }}</a>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="empty-message">У вас нет чатов.</p>
-                {% endif %}
-            </div>
-            <div class="invitation-list">
-                <h2>Уведомления</h2>
-                {% if notifications %}
-                    {% for notification in notifications %}
-                        <div class="invitation-item">
-                            {% if notification|instanceof:"MyChat.ChatInvite" %}
-                                <p>Приглашение от <strong>{{ notification.user.username }}</strong> в чат <strong>{{ notification.chat.name }}</strong></p>
-                            {% elif notification|instanceof:"MyChat.ChatJoinRequest" %}
-                                <p>Запрос от <strong>{{ notification.user.username }}</strong> на вступление в чат <strong>{{ notification.chat.name }}</strong></p>
-                            {% endif %}
-                            <div class="button-container">
-                                <a href="{% url 'accept_invite' notification.id %}" class="button accept-button">Принять</a>
-                                <a href="{% url 'decline_invite' notification.id %}" class="button decline-button">Отклонить</a>
+        <main>
+            <h1>Профиль пользователя</h1>
+            <div class="profile-container">
+                <div class="chat-list">
+                    <h2>Ваши чаты</h2>
+                    {% if chats %}
+                        {% for chat in chats %}
+                            <div class="chat-item">
+                                <a href="{% url 'chat_page' chat.id %}">{{ chat.name }}</a>
                             </div>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="empty-message">Нет новых уведомлений.</p>
-                {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p class="empty-message">У вас нет чатов.</p>
+                    {% endif %}
+                </div>
+                <div class="invitation-list">
+                    <h2>Уведомления</h2>
+                    {% if notifications %}
+                        {% for notification in notifications %}
+                            <div class="invitation-item">
+                                {% if notification|instanceof:"MyChat.ChatInvite" %}
+                                    <p>Приглашение от <strong>{{ notification.inviter.username }}</strong> в чат <strong>{{ notification.chat.name }}</strong></p>
+                                    <div class="button-container">
+                                        <a href="{% url 'accept_invite' notification.id %}" class="button accept-button">Принять</a>
+                                        <a href="{% url 'decline_invite' notification.id %}" class="button decline-button">Отклонить</a>
+                                    </div>
+                                {% elif notification|instanceof:"MyChat.ChatJoinRequest" %}
+                                    <p>Запрос от <strong>{{ notification.user.username }}</strong> на вступление в чат <strong>{{ notification.chat.name }}</strong></p>
+                                    <div class="button-container">
+                                        <a href="{% url 'accept_join_request' notification.id %}" class="button accept-button">Принять</a>
+                                        <a href="{% url 'decline_join_request' notification.id %}" class="button decline-button">Отклонить</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="empty-message">Нет новых уведомлений.</p>
+                    {% endif %}
+                </div>
             </div>
-        </div>
-    </main>
-</body>
+        </main>
+    </body>
 </html>
