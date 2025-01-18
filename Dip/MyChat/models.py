@@ -20,6 +20,16 @@ class ChatInvite(models.Model):
     class Meta:
         unique_together = ('chat', 'user')
 
+class ChatJoinRequest(models.Model):
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='join_requests')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='join_requests')
+    status = models.CharField(max_length=10, choices=[('pending', 'Pending'), ('accepted', 'Accepted'), ('declined', 'Declined')], default='pending')
+
+    class Meta:
+        unique_together = ('chat', 'user')
+
+    def __str__(self):
+        return f"{self.user} requests to join {self.chat}"
 
 class Message(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages')

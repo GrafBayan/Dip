@@ -1,11 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from .models import Chat, Message, User, ChatInvite
+from .models import Chat, Message, User, ChatInvite, ChatJoinRequest
 from django.contrib import messages as django_messages
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 @login_required
@@ -13,13 +14,23 @@ def chat_list(request):
     all_chats = Chat.objects.all()
     user = request.user
     user_chats = Chat.objects.filter(Q(users=user) | Q(creator=user)).distinct()
-
     search_query = request.GET.get('search', '')
 
     if search_query:
         all_chats = all_chats.filter(name__icontains=search_query)
+
+    # Пагинация
+    paginator = Paginator(all_chats, 8)
+    page_number = request.GET.get('page')
+    try:
+        chats = paginator.page(page_number)
+    except PageNotAnInteger:
+        chats = paginator.page(1)
+    except EmptyPage:
+        chats = paginator.page(paginator.num_pages)
+
     return render(request, 'MyChat/chat_home.html', {
-        'chats': all_chats,
+        'chats': chats,
         'user_chats': user_chats,
         'search_query': search_query
     })
@@ -28,7 +39,12 @@ def chat_list(request):
 def chat_page(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id)
     if not (chat.users.filter(id=request.user.id).exists() or chat.creator == request.user):
-        django_messages.warning(request, 'У вас нет доступа к этому чату.')
+        # Проверяем, есть ли уже запрос на вступление
+        if not ChatJoinRequest.objects.filter(chat=chat, user=request.user).exists():
+            ChatJoinRequest.objects.create(chat=chat, user=request.user)
+            django_messages.success(request, 'Ваш запрос на вступление в чат отправлен создателю.')
+        else:
+            django_messages.warning(request, 'Вы уже отправили запрос на вступление в этот чат.')
         return redirect('chat_list')
 
     chat_messages = chat.messages.all()
@@ -72,7 +88,6 @@ def create_chat(request):
             try:
                 user = User.objects.get(id=user_id)
                 new_chat.invited_users.add(user)
-                # Создаем запись в ChatInvite
                 ChatInvite.objects.create(chat=new_chat, user=user)
             except User.DoesNotExist:
                 django_messages.error(request, f"Пользователь с ID {user_id} не найден.")
@@ -104,9 +119,10 @@ def add_user_to_chat(request, chat_id):
     chat = get_object_or_404(Chat, id=chat_id)
     if chat.creator != request.user:
         return JsonResponse({'message': 'Вы не имеете прав на добавление пользователей.'}, status=403)
-    user_id = request.POST.get('user_id')
-    if user_id:
-        user = get_object_or_404(User, id=user_id)
-        chat.users.add(user)
-        return JsonResponse({'message': 'Пользователь добавлен в чат!'})
-    return JsonResponse({'message': 'Не указан пользователь.'}, status=400)
+    existing_users = chat.users.all()
+    available_users = User.objects.exclude(id__in=existing_users.values_list('id', flat=True))
+
+    return render(request, 'your_template.html', {
+        'chat': chat,
+        'available_users': available_users,
+    })

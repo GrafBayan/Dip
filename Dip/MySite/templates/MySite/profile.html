@@ -4,20 +4,54 @@
     <meta charset="UTF-8">
     <title>Профиль пользователя</title>
     {% load static %}
+    {% load custom_filters %}
     <link rel="stylesheet" href="{% static 'MySite/style.css' %}">
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
         .profile-container {
             display: flex;
             justify-content: space-between;
-            padding: 20px;
+            gap: 20px;
         }
-        .chat-list, .invitation-list {
+
+        .chat-list {
             border: 1px solid #ccc;
             border-radius: 5px;
-            padding: 10px;
-            width: 45%;
+            padding: 15px;
+            width: 30%;
             min-height: 200px;
+            max-height: 500px;
             background-color: #f9f9f9;
+            overflow-y: auto;
+        }
+
+        .invitation-list {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            width: 68%;
+            min-height: 200px;
+            max-height: 500px;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+        }
+
+        h1, h2 {
+            color: #333;
         }
         .empty-message {
             color: #888;
@@ -35,26 +69,31 @@
             background-color: #f1f1f1;
         }
         .button {
-            padding: 10px 15px;
+            padding: 4px 8px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             text-decoration: none;
             color: white;
             margin-left: 10px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.2s;
         }
+
+        .button:hover {
+            transform: scale(1.05);
+        }
+
         .accept-button {
-            background-color: blue;
+            background-color: #4CAF50; /* Зеленый */
         }
         .accept-button:hover {
-            background-color: darkblue;
+            background-color: #45a049;
         }
         .decline-button {
-            background-color: red;
+            background-color: #f44336; /* Красный */
         }
         .decline-button:hover {
-            background-color: darkred;
+            background-color: #d32f2f;
         }
         /* Стили для ссылок в списке чатов */
         .chat-item a {
@@ -65,10 +104,35 @@
         .chat-item a:hover {
             text-decoration: underline;
         }
+
         .invitation-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 5px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+            transition: background-color 0.3s;
+            max-height: 60px;
+            overflow: hidden;
+        }
+
+        .invitation-item p {
+            margin: 0;
+            font-size: 14px;
+            flex-grow: 1;
+            max-height: 40px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-left: 10px;
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -87,7 +151,9 @@
                     },
                     success: function(data) {
                         alert(data.message);
-                        button.closest('.invitation-item').remove();
+                        button.closest('.invitation-item').fadeOut(300, function() {
+                            $(this).remove(); // Удаляем элемент после завершения анимации
+                        });
                     },
                     error: function(xhr, status, error) {
                         alert('Произошла ошибка: ' + error);
@@ -116,19 +182,23 @@
                 {% endif %}
             </div>
             <div class="invitation-list">
-                <h2>Приглашения в чаты</h2>
-                {% if invitations %}
-                    {% for invitation in invitations %}
+                <h2>Уведомления</h2>
+                {% if notifications %}
+                    {% for notification in notifications %}
                         <div class="invitation-item">
-                            <p>Приглашение от {{ invitation.sender.username }} в чат <strong>{{ invitation.chat.name }}</strong></p>
-                            <div>
-                                <a href="{% url 'accept_invite' invitation.id %}" class="button accept-button">Принять</a>
-                                <a href="{% url 'decline_invite' invitation.id %}" class="button decline-button">Отклонить</a>
+                            {% if notification|instanceof:"MyChat.ChatInvite" %}
+                                <p>Приглашение от <strong>{{ notification.user.username }}</strong> в чат <strong>{{ notification.chat.name }}</strong></p>
+                            {% elif notification|instanceof:"MyChat.ChatJoinRequest" %}
+                                <p>Запрос от <strong>{{ notification.user.username }}</strong> на вступление в чат <strong>{{ notification.chat.name }}</strong></p>
+                            {% endif %}
+                            <div class="button-container">
+                                <a href="{% url 'accept_invite' notification.id %}" class="button accept-button">Принять</a>
+                                <a href="{% url 'decline_invite' notification.id %}" class="button decline-button">Отклонить</a>
                             </div>
                         </div>
                     {% endfor %}
                 {% else %}
-                    <p class="empty-message">У вас нет приглашений в чаты.</p>
+                    <p class="empty-message">Нет новых уведомлений.</p>
                 {% endif %}
             </div>
         </div>

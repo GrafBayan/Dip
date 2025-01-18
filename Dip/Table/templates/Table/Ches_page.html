@@ -15,74 +15,73 @@
         main {
             margin: 0 auto;
             padding: 20px;
-            max-width: 800px; /* Максимальная ширина для центрирования */
-            text-align: center; /* Центрируем текст */
+            max-width: 800px;
+            text-align: center;
         }
 
         /* Стили для заголовков */
         h1, h2 {
-            color: #333; /* Цвет заголовков */
-            margin-bottom: 20px; /* Отступ снизу */
+            color: #333;
+            margin-bottom: 20px;
         }
 
         /* Стили для формы */
         .form-container {
-            margin-bottom: 20px; /* Отступ снизу */
+            margin-bottom: 20px;
             display: flex;
-            flex-direction: column; /* Выравнивание по вертикали */
-            align-items: center; /* Центрируем элементы по горизонтали */
+            flex-direction: column;
+            align-items: center;
         }
 
         /* Стили для полей ввода */
         #room-name {
-            width: 100%; /* Занимает всю ширину */
-            max-width: 350px; /* Максимальная ширина для поля ввода */
+            width: 100%;
+            max-width: 350px;
             height: 35px;
             padding: 5px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            margin-bottom: 10px; /* Отступ снизу */
+            margin-bottom: 10px;
         }
 
         /* Стили для кнопки создания комнаты */
         .header-button {
-            padding: 10px 20px; /* Увеличиваем размер кнопки */
-            background-color: #4b5b2c; /* Темно-оливковый цвет кнопки */
+            padding: 10px 20px;
+            background-color: #4b5b2c;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
-            margin-top: 10px; /* Отступ сверху */
+            margin-top: 10px;
         }
 
         .header-button:hover {
-            background-color: #3a4a2c; /* Темнее на ховер */
+            background-color: #3a4a2c;
         }
 
-        /* Стили для списка игровых сессий */
         .room-list {
-            margin-top: 20px; /* Отступ сверху */
+            margin-top: 20px;
         }
 
         .room-list ul {
-            list-style-type: none; /* Убираем маркеры списка */
-            padding: 0; /* Убираем отступы */
-            margin: 0; /* Убираем отступы */
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
         }
 
         .room-item {
             padding: 10px;
-            border: 1px solid #ccc; /* Обводка вокруг элемента */
-            border-radius: 15px; /* Округленные углы */
+            border: 1px solid #ccc;
+            border-radius: 15px;
             margin-bottom: 10px;
-            background-color: #f9f9f9; /* Цвет фона */
-            transition: background-color 0.2s; /* Плавный переход цвета фона */
-            text-align: center; /* Центрируем текст в списке */
+            background-color: #f9f9f9;
+            transition: background-color 0.2s;
+            text-align: center;
         }
 
         .room-item:hover {
-            background-color: #f0f0f0; /* Цвет фона при наведении */
+            background-color: #f0f0f0;
         }
     </style>
     <main>
@@ -96,12 +95,30 @@
         <div class="room-list">
             <h2>Существующие комнаты:</h2>
             <ul>
-                <!-- Здесь будет список существующих комнат -->
                 {% for room in rooms %}
                     <li class="room-item">{{ room.name }}</li>
                 {% endfor %}
             </ul>
         </div>
+
+        <div class="pagination">
+            <span class="step-links">
+                {% if rooms.has_previous %}
+                    <a href="?page=1">&laquo; Первая</a>
+                    <a href="?page={{ rooms.previous_page_number }}">Назад</a>
+                {% endif %}
+
+                <span class="current">
+                    Страница {{ rooms.number }} из {{ rooms.paginator.num_pages }}.
+                </span>
+
+                {% if rooms.has_next %}
+                    <a href="?page={{ rooms.next_page_number }}">Вперед</a>
+                    <a href="?page={{ rooms.paginator.num_pages }}">Последняя &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+
     </main>
 </body>
 </html>

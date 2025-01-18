@@ -9,7 +9,6 @@ class Room(models.Model):
         self.save()
 
     def delete(self, *args, **kwargs):
-        # Здесь можно добавить другую логику перед удалением, если это необходимо
         super().delete(*args, **kwargs)
 
     def __str__(self):

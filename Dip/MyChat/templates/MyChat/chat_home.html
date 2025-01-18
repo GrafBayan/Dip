@@ -137,6 +137,24 @@
             </form>
         </div>
 
+        <div class="pagination">
+            <span class="step-links">
+                {% if chats.has_previous %}
+                    <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">&laquo; Первая</a>
+                    <a href="?page={{ chats.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Назад</a>
+                {% endif %}
+
+                <span class="current">
+                    Страница {{ chats.number }} из {{ chats.paginator.num_pages }}.
+                </span>
+
+                {% if chats.has_next %}
+                    <a href="?page={{ chats.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Вперед</a>
+                    <a href="?page={{ chats.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">Последняя &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+
         <div class="chat-container">
             {% for chat in chats %}
                 <div class="chat-item">

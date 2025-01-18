@@ -5,20 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Page</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'MySite/style.css' %}"> <!-- Подключение CSS -->
+    <link rel="stylesheet" href="{% static 'MySite/style.css' %}">
 </head>
 <body>
     {% include 'MySite/cap.html' %}
-    <main>
+    <main class="main-home">
         <h1>Добро пожаловать к столу!</h1>
         <div class="button-container">
             <a href="#" class="image-button">
                 <img src="{% static 'Table/catam.png' %}" alt="Catamaran">
-                <p>Котэм</p> <!-- Добавлен текст под изображением -->
+                <p>Котэм</p>
             </a>
             <a href="{% url 'ches_page' %}" class="image-button">
                 <img src="{% static 'Table/ches.png' %}" alt="Chess">
-                <p>Шашки</p> <!-- Добавлен текст под изображением -->
+                <p>Шашки</p>
             </a>
         </div>
     </main>

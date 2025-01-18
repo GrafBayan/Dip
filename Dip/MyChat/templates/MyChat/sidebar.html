@@ -13,11 +13,33 @@
             background-color: #7D7D7D;
             transition: left 0.3s;
             z-index: 1000;
-
         }
         .sidebar-content {
-            padding: 20px;
+            padding: 5px;
+            max-height: 100vh;
+            overflow-y: auto;
         }
+
+        /* Стили для ползунка прокрутки */
+        .sidebar-content::-webkit-scrollbar {
+            width: 6px;
+            display: none;
+        }
+
+        .sidebar-content.scroll-active::-webkit-scrollbar {
+            display: block;
+        }
+
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+
+        .sidebar-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
         .menu-toggle {
             position: fixed;
             left: 0;
@@ -85,11 +107,25 @@
         if (sidebar.style.left === '0px') {
             sidebar.style.left = '-300px';
             menuToggle.style.left = '0';
+            menuToggle.textContent = '➔';
         } else {
             sidebar.style.left = '0px';
             menuToggle.style.left = '300px';
+            menuToggle.textContent = '‖';
         }
     };
+
+    const sidebarContent = document.querySelector('.sidebar-content');
+
+    sidebarContent.addEventListener('scroll', function() {
+        sidebarContent.classList.add('scroll-active');
+        clearTimeout(sidebarContent.scrollTimeout);
+
+        sidebarContent.scrollTimeout = setTimeout(function() {
+            sidebarContent.classList.remove('scroll-active');
+        }, 1000);
+    });
+
 </script>
 </body>
 </html>
