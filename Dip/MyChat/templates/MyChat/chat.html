@@ -22,8 +22,32 @@
             display: flex;
             flex-direction: column;
             height: 400px;
-            overflow-y: auto;
+            overflow-y: hidden;
             padding: 10px;
+            transition: overflow-y 0.2s;
+        }
+
+        /* Стилизация полосы прокрутки */
+        .chat-window::-webkit-scrollbar {
+            width: 8px; /* Ширина полосы прокрутки */
+        }
+
+        .chat-window::-webkit-scrollbar-track {
+            background: #f1f1f1; /* Цвет фона полосы прокрутки */
+        }
+
+        .chat-window::-webkit-scrollbar-thumb {
+            background: #6b8e23; /* Цвет "ползунка" полосы прокрутки */
+            border-radius: 10px; /* Скругление углов "ползунка" */
+        }
+
+        .chat-window::-webkit-scrollbar-thumb:hover {
+            background: #4a6f1d; /* Цвет "ползунка" при наведении */
+        }
+
+        /* Класс для показа полосы прокрутки */
+        .show-scrollbar {
+            overflow-y: auto; /* Показывает полосу прокрутки */
         }
 
         #message-list {
@@ -282,7 +306,8 @@
 
         <script>
             const messageList = document.getElementById('message-list');
-            const chatWindow = document.getElementById('chat-window');
+            const chatWindow = document.querySelector('.chat-window');
+            const currentUsername = '{{ request.user.username }}';
 
             // Функция для прокрутки вниз
             function scrollToBottom() {
@@ -294,7 +319,16 @@
                 scrollToBottom();
             };
 
-            document.getElementById('send-button').onclick = function() {
+            document.getElementById('send-button').onclick = sendMessage;
+
+            document.getElementById('message-input').addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') { // Проверяем, нажата ли клавиша Enter
+                    event.preventDefault(); // Отменяем стандартное поведение (например, переход на новую строку)
+                    sendMessage(); // Вызываем функцию отправки сообщения
+                }
+            });
+
+            function sendMessage() {
                 const messageInput = document.getElementById('message-input');
                 const messageText = messageInput.value;
 
@@ -319,6 +353,14 @@
                     .then(data => {
                         // Обновление окна чата с новым сообщением
                         const newMessage = document.createElement('li');
+
+                        // Сравниваем имя пользователя с именем текущего пользователя
+                        if (data.username === currentUsername) {
+                            newMessage.classList.add('my-message'); // Класс для сообщений от себя
+                        } else {
+                            newMessage.classList.add('other-message'); // Класс для сообщений от других
+                        }
+
                         newMessage.innerHTML = `<strong>${data.username}:</strong> ${data.text}`;
                         messageList.appendChild(newMessage);
                         messageInput.value = '';
@@ -330,7 +372,35 @@
                         console.error('Ошибка:', error);
                     });
                 }
-            };
+            }
+
+            // Добавляем обработчик события на прокрутку
+            chatWindow.addEventListener('wheel', () => {
+                chatWindow.classList.add('show-scrollbar'); // Показываем полосу прокрутки
+
+                // Убираем класс через 1 секунду, если не происходит дальнейшей прокрутки
+                clearTimeout(chatWindow.scrollTimeout);
+                chatWindow.scrollTimeout = setTimeout(() => {
+                    chatWindow.classList.remove('show-scrollbar'); // Скрываем полосу прокрутки
+                }, 1000); // Время задержки перед скрытием (1000 мс = 1 секунда)
+            });
+
+            let isScrolling = false;
+
+            // Обработчик события прокрутки
+            chatWindow.addEventListener('scroll', () => {
+                if (!isScrolling) {
+                    isScrolling = true;
+                    requestAnimationFrame(() => {
+                        if (chatWindow.scrollTop + chatWindow.clientHeight < chatWindow.scrollHeight) {
+                            chatWindow.classList.add('show-scrollbar'); // Показываем полосу прокрутки
+                        } else {
+                            chatWindow.classList.remove('show-scrollbar'); // Если прокручиваем вниз, скрываем полосу прокрутки
+                        }
+                        isScrolling = false;
+                    });
+                }
+            });
 
             // Обработчик для кнопки Roll
             document.getElementById('roll-button').onclick = function(event) {
